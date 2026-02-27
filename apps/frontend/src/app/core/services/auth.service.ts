@@ -27,6 +27,6 @@ export class AuthService {
   }
 
   async getIdToken(): Promise<string | null> {
-    return this.auth.currentUser?.getIdToken() ?? null;
+    return (await this.auth.currentUser?.getIdToken()) ?? null;
   }
 }

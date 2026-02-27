@@ -34,8 +34,14 @@ export class NotificationsService {
     const targetDate = target.toISOString().split('T')[0];
     const targetTime = `${String(target.getHours()).padStart(2, '0')}:${String(target.getMinutes()).padStart(2, '0')}`;
 
+    const toMinutes = (t: string) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+    const targetMinutes = toMinutes(targetTime);
+
     const schedules = await this.schedulesService.findByDateRange(targetDate, targetDate);
-    const upcoming = schedules.filter(s => s.startTime === targetTime);
+    const upcoming = schedules.filter(s => Math.abs(toMinutes(s.startTime) - targetMinutes) < 15);
 
     for (const schedule of upcoming) {
       await this.sendReminderToParticipants(schedule, NotificationType.SCHEDULE_REMINDER_PRE);

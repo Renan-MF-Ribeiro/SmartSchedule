@@ -4,7 +4,7 @@ import {
   IsArray,
   ValidateNested,
   Matches,
-  IsISO8601,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -23,6 +23,7 @@ export class CreateSchedulePositionDto {
   @IsString()
   userPhone?: string;
 
+  @IsNumber()
   order: number;
 }
 
@@ -34,7 +35,7 @@ export class CreateScheduleDto {
   @IsString()
   description?: string;
 
-  @IsISO8601()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'date must be in YYYY-MM-DD format' })
   date: string;
 
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)

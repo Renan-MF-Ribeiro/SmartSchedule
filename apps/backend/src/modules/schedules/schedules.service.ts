@@ -127,11 +127,20 @@ export class SchedulesService {
       const existStart = toMinutes(s.startTime);
       const existEnd = toMinutes(s.endTime);
 
-      const gap1 = newStart - existEnd;
-      const gap2 = existStart - newEnd;
-      const minGap = Math.max(gap1, gap2);
+      const overlaps = newStart < existEnd && newEnd > existStart;
+      if (overlaps) {
+        throw new BadRequestException(
+          `Schedules on the same day must have at least ${MIN_INTERVAL_MINUTES} minutes between them`,
+        );
+      }
 
-      if (minGap < MIN_INTERVAL_MINUTES) {
+      const gapAfterExisting = newStart - existEnd;
+      const gapAfterNew = existStart - newEnd;
+
+      if (
+        (newStart >= existEnd && gapAfterExisting < MIN_INTERVAL_MINUTES) ||
+        (existStart >= newEnd && gapAfterNew < MIN_INTERVAL_MINUTES)
+      ) {
         throw new BadRequestException(
           `Schedules on the same day must have at least ${MIN_INTERVAL_MINUTES} minutes between them`,
         );
