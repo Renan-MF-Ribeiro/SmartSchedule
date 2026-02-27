@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { SchedulesRepository } from './schedules.repository';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
@@ -81,7 +82,7 @@ export class SchedulesService {
   ): Promise<void> {
     const schedule = await this.findById(scheduleId);
     const comment = {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       userId,
       userName,
       content,
@@ -93,17 +94,13 @@ export class SchedulesService {
 
   /** Links pending phone-based positions to a user when they register */
   async linkUserByPhone(userId: string, phone: string): Promise<void> {
-    const snapshot = await this.schedulesRepo['firebase'].firestore
-      .collection('schedules')
-      .where('positions', 'array-contains', { userPhone: phone })
-      .get();
+    const schedules = await this.schedulesRepo.findSchedulesWithPhone(phone);
 
-    for (const doc of snapshot.docs) {
-      const schedule = { id: doc.id, ...doc.data() } as ISchedule;
+    for (const schedule of schedules) {
       const updatedPositions = schedule.positions.map(p =>
         p.userPhone === phone ? { ...p, userId, userPhone: undefined } : p,
       );
-      await this.schedulesRepo.update(doc.id, { positions: updatedPositions });
+      await this.schedulesRepo.update(schedule.id, { positions: updatedPositions });
     }
   }
 

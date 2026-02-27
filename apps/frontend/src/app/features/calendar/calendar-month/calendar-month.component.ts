@@ -150,8 +150,8 @@ export class CalendarMonthComponent implements OnInit {
     this.loadSchedules();
   }
 
-  protected onDayClick(day: CalendarDay): void {
-    console.log('Day clicked:', day.date);
+  protected onDayClick(_day: CalendarDay): void {
+    // TODO: Navigate to day detail or open create schedule modal
   }
 
   protected getScheduleClass(status: ScheduleStatus): string {

@@ -62,4 +62,12 @@ export class SchedulesRepository {
   async delete(id: string): Promise<void> {
     await this.firebase.firestore.collection(this.collection).doc(id).delete();
   }
+
+  async findSchedulesWithPhone(phone: string): Promise<ISchedule[]> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('positions', 'array-contains', { userPhone: phone })
+      .get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ISchedule));
+  }
 }
