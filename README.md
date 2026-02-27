@@ -1,0 +1,2 @@
+# SmartSchedule
+Gerenciador de escalas
